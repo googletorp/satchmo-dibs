@@ -5,14 +5,32 @@ from django.utils.translation import ugettext_lazy as _
 gettext = lambda s: s
 
 PAYMENT_MODULES = config_get('PAYMENT', 'MODULES')
-PAYMENT_MODULES.add_choice(('PAYMENT_DUMMY', _('Payment Test Module')))
+PAYMENT_MODULES.add_choice(('PAYMENT_DIBS', _('DIBS payment module')))
 
-PAYMENT_GROUP = ConfigurationGroup('PAYMENT_DUMMY', 
-    _('Payment Test Module Settings'), 
+PAYMENT_GROUP = ConfigurationGroup('PAYMENT_DIBS',
+    _('DIBS payment module settings'),
     requires=PAYMENT_MODULES,
     ordering = 100)
 
 config_register_list(
+    StringValue(PAYMENT_GROUP,
+        'MERCHANT',
+        description=_("DIBS merchant key"),
+        hidden=False,
+        default = ''),
+
+    StringValue(PAYMENT_GROUP,
+        'MD51',
+        description=_("DIBS MD5 key 1"),
+        hidden=False,
+        default = ''),
+
+    StringValue(PAYMENT_GROUP,
+        'MD52',
+        description=_("DIBS MD5 key 2"),
+        hidden=False,
+        default = ''),
+
     BooleanValue(PAYMENT_GROUP, 
         'SSL', 
         description=_("Use SSL for the module checkout pages?"), 
@@ -28,34 +46,36 @@ config_register_list(
         'MODULE',
         description=_('Implementation module'),
         hidden=True,
-        default = 'payment.modules.dummy'),
-        
+        default = 'payment.modules.dibs'),
+
     StringValue(PAYMENT_GROUP,
         'KEY',
         description=_("Module key"),
         hidden=True,
-        default = 'DUMMY'),
+        default = 'DIBS'),
 
     StringValue(PAYMENT_GROUP,
         'LABEL',
         description=_('English name for this group on the checkout screens'),
-        default = 'Payment test module',
+        default = 'Credit card',
         help_text = _('This will be passed to the translation utility')),
 
     StringValue(PAYMENT_GROUP,
         'URL_BASE',
         description=_('The url base used for constructing urlpatterns which will use this module'),
-        default = '^dummy/'),
+        default = '^credit/'),
 
     MultipleStringValue(PAYMENT_GROUP,
         'CREDITCHOICES',
         description=_('Available credit cards'),
         choices = (
+            (('Dankort','Dankort')),
+            (('VISA/Dankort','VISA/Dankort')),
             (('Visa','Visa')),
             (('Mastercard','Mastercard')),
             (('Discover','Discover')),
             (('American Express', 'American Express'))),
-        default = ('Visa', 'Mastercard', 'Discover', 'American Express')),
+        default = ('Dankort', 'VISA/Dankort', 'Visa', 'Mastercard', 'Discover', 'American Express')),
         
     BooleanValue(PAYMENT_GROUP,
         'CAPTURE',
